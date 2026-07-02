@@ -1,4 +1,4 @@
-# Modulo para el menu principal.
+# Modulo para el menu principal del programa.
 
 
 from crud import agregar, consultar, actualizar, borrar

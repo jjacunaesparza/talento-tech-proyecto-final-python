@@ -1,3 +1,10 @@
+"""
+Archivo principal del proyecto.
+
+Ejecutar este archivo para iniciar la aplicación.
+"""
+
+
 # Proyecto Final
 """
 Base de datos: Crear una base de datos llamada 'inventario.db' para almacenar los datos de los productos. La
@@ -35,26 +42,47 @@ Requisitos técnicos:
     Los comentarios deben estar presentes en el código, explicando las partes clave del mismo.
 """
 
+
 # Resolucion
+
 
 import sqlite3
 from menu import menu
 
-conexion = sqlite3.connect("productos.db")  # Establecer la conexión a la base de datos
 
-cursor = conexion.cursor()  # Crear un objeto cursor
+def main() -> None:
+    """
+    Función principal del programa.
+    Establece la conexión con la base de datos, crea la tabla de productos si no existe, invoca el menú
+    principal y cierra la conexión al finalizar.
+    Parametros:
+        (ninguno)
+    Retorna:
+        (nada)
+    """
 
-# Crear una tabla productos.db:
-cursor.execute(''' CREATE TABLE IF NOT EXISTS productos
-               (
-               id INTEGER PRIMARY KEY AUTOINCREMENT,
-               nombre TEXT NOT NULL,
-               cantidad INT NOT NULL,
-               precio REAL NOT NULL,
-               categoria TEXT
-               )
-            ''')
+    conexion = sqlite3.connect("productos.db")  # Establecer la conexión a la base de datos
 
-conexion.commit()
+    cursor = conexion.cursor()  # Crear un objeto cursor
 
-menu(cursor,conexion)
+    try:
+        # Crear una tabla productos.db:
+        cursor.execute(''' CREATE TABLE IF NOT EXISTS productos
+                    (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    nombre TEXT NOT NULL,
+                    cantidad INT NOT NULL,
+                    precio REAL NOT NULL,
+                    categoria TEXT
+                    )
+                    ''')
+
+        conexion.commit()
+
+        menu(cursor,conexion)
+
+    finally:  # Aca me aseguro que la conexión se cierre siempre, incluso si una excepción no controlada llega hasta main()
+        conexion.close()
+
+if __name__ == "__main__":
+   main()

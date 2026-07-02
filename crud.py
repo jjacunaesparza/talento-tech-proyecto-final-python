@@ -97,10 +97,10 @@ def actualizar(cursor, conexion) -> None:
         else:
             print("\n===== Producto encontrado =====")
             print(f"ID: {producto[0]}")
-            print(f"Nombre: {producto[1]}")
+            print(f"Nombre: {producto[1].title()}")
             print(f"Cantidad: {producto[2]}")
             print(f"Precio: $ {producto[3]:.2f}")
-            print(f"Categoría: {producto[4]}")
+            print(f"Categoría: {producto[4].capitalize()}")
 
             print("\nIngrese los nuevos datos:")
 
@@ -114,9 +114,7 @@ def actualizar(cursor, conexion) -> None:
             if filas_afectadas == -1:
                 continue
 
-            print("\n✅ Producto actualizado exitosamente!")
-
-            mas_datos = input("Desea actualizar otro producto? (s/n): ").lower().strip()
+            mas_datos = input("\n✅ Producto actualizado exitosamente! Desea actualizar otro producto? (s/n): ").lower().strip()
 
         if mas_datos != "s":
             return None

@@ -1,0 +1,9 @@
+# Base de datos
+productos.db
+
+# Entorno virtual
+.venv/
+
+# Caché de Python
+__pycache__/
+*.pyc
