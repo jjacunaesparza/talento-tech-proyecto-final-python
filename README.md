@@ -66,6 +66,3 @@ python3 main.py
 ## Autor
 
 Proyecto desarrollado como trabajo final para **Talento Tech**.
-Juan Acuña  
-GitHub: https://github.com/tuusuario  
-Proyecto Final - Talento Tech (Python / SQLite)
