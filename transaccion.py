@@ -1,4 +1,4 @@
-# Modulo para las transacciones con la base de datos.
+# Modulo donde se almacenan las funciones que acceden a la capa de acceso a datos.
 
 
 import sqlite3
@@ -26,7 +26,7 @@ def agregar_en_tabla(cursor, conexion, nombre:str, cantidad:int, precio:float, c
         # Insertar el nuevo producto en la tabla
         cursor.execute('''INSERT INTO productos (nombre, cantidad, precio, categoria) VALUES
                     (?, ?, ?, ?)
-                    ''',(nombre.title(),cantidad,precio,categoria.capitalize())
+                    ''',(nombre,cantidad,precio,categoria)
                     )
 
         # Confirmar los cambios
@@ -39,19 +39,54 @@ def agregar_en_tabla(cursor, conexion, nombre:str, cantidad:int, precio:float, c
 
 
 
-# TRANSACCION PARA ACTAULIZAR UN REGISTRO POR ID O POR NOMBRE
-def actualizar_en_tabla(cursor, conexion, campo:str, valor:int | str) -> int:
+# TRANSACCION PARA ACTUALIZAR UN REGISTRO POR ID O POR NOMBRE
+def actualizar_en_tabla(cursor, conexion, id:int, nombre:str, cantidad:int, precio:float, categoria:str) -> int:
     """
     Funcion para actualizar un registro por ID o por nombre y asegurar la correcta escritura en la tabla.
     Parametros: 
         cursor: objeto que actúa como intermediario entre el programa y la base de datos.
         conexion: objeto que representa la conexión abierta con la base de datos.
-        campo: string con el nombre de la columna por la que se buscará el registro a actualizar.
-        valor: string o entero a buscar en la columna indicada.
+        id: ID del producto a actualizar.
+        nombre: nuevo nombre.
+        cantidad: nueva cantidad.
+        precio: nuevo precio.
+        categoria: nueva categoría.
     Retorna:
-        cursor.rowcount: entero con la cantidad de filas que fueron afectadas en la ultima sentencia SQL ejecutada.
-        -1 en caso que ocurra una excepcion
+        1 si la actualización fue exitosa.
+        0 si no se encontró el producto.
+        -1 si ocurrió un error.
     """
+
+    try:
+        conexion.execute("BEGIN TRANSACTION")
+
+        cursor.execute(
+            """
+            UPDATE productos
+            SET nombre = ?, cantidad = ?, precio = ?, categoria = ?
+            WHERE id = ?
+            """,
+            (
+                nombre.title(),
+                cantidad,
+                precio,
+                categoria.capitalize(),
+                id
+            )
+        )
+
+        if cursor.rowcount == 0:
+            conexion.rollback()
+            return 0
+
+        conexion.commit()
+        return 1
+
+    except sqlite3.Error as e:
+        # Si ocurre un error, se revierten los cambios
+        conexion.rollback()
+        print(f"⛔ Error al registrar el cambio en la base de datos: {e}")
+        return -1 # Se devuelve el valor -1 como indicador de error
 
 
 
@@ -78,13 +113,33 @@ def borrar_en_tabla(cursor, conexion, campo:str, valor:int | str) -> int:
 
         if cursor.rowcount == 0:
             conexion.rollback()
-        else:
-            conexion.commit()
+            return 0
 
-        return cursor.rowcount
+        conexion.commit()
+        return 1
 
     except sqlite3.Error as e:
         # Si ocurre un error, se revierten los cambios
         conexion.rollback()
         print(f"⛔ Error al registrar el cambio en la base de datos: {e}")
         return -1  # Se devuelve el valor -1 como indicador de error
+    
+
+
+# BUSQUEDA DE UN REGISTRO
+def buscar_producto(cursor, campo:str, valor:int | str) -> tuple | None:
+    """
+    Busca un producto por ID o por nombre.
+    Parametros:
+        cursor: objeto que actúa como intermediario entre el programa y la base de datos.
+        campo: nombre de la columna por la que se realizará la búsqueda ("ID" o "nombre").
+        valor: valor a buscar en la columna indicada.
+
+    Retorna:
+        Una tupla con los datos del producto si existe.
+        None si no se encontró ningún registro.
+    """
+
+    cursor.execute(f"SELECT * FROM productos WHERE {campo} = ?", (valor,))
+
+    return cursor.fetchone()

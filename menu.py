@@ -22,7 +22,7 @@ def menu(cursor,conexion) -> None:
         print("\nBienvenidos!\n")
         print("1 - Agregar Producto")
         print("2 - Mostrar")
-        print("3 - Busqueda")
+        print("3 - Actualizar")
         print("4 - Eliminar")
         print("5 - Salir")
 
